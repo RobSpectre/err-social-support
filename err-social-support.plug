@@ -1,0 +1,9 @@
+[Core]
+Name = SocialSupport 
+Module = err-social-support
+
+[Python]
+Version = 2+
+
+[Documentation]
+Description = Plugin for support teams to monitor social channels. 
