@@ -114,6 +114,18 @@ class SocialSupport(BotPlugin):
         self['SUPPORT_TRAINER_QUEUE'] = temp_trainers
         return self['SUPPORT_TRAINER_QUEUE']
 
+    def pop_tweet_for_trainer(self, trainer):
+        temp_trainer = self['SUPPORT_TRAINER_QUEUE']
+
+        if temp_trainer.get(trainer, None):
+            tweet = temp_trainer[trainer]
+            temp_trainer[trainer] = None
+
+            self['SUPPORT_TRAINER_QUEUE'] = temp_trainer
+            return tweet
+        else:
+            return None
+
     def update_corpus(self, corpus, tweet, classification):
         temp_corpus = self[corpus]
         temp_corpus.append((tweet, classification))
@@ -135,6 +147,21 @@ class SocialSupport(BotPlugin):
                           key=operator.itemgetter(1),
                           reverse=True)[:limit]
         return top_five
+
+    def train_classifier_with_tweet(self, from_, tweet,
+                                    classification):
+        tweet = self.pop_tweet_for_trainer(from_)
+        if tweet:
+            scoreboard = self.update_trainer_scoreboard(from_)
+            self.update_corpus("SUPPORT_TRAINING_CORPUS",
+                               tweet,
+                               classification)
+            trainer_score = scoreboard[from_]
+            return "Thank you for the training! Your score is now: " \
+                   "{0}, {1}".format(str(trainer_score, from_))
+        else:
+            return "Have I given you a tweet to classify yet? Send !train " \
+                   "gimme to receive one."
 
     @botcmd
     def train_status(self, message, args):

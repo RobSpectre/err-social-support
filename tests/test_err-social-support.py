@@ -116,6 +116,12 @@ class TestSocialSupportUtilities(TestSocialSupport):
                      "http://t.co/b3a2m6S2BN #GoBucks ht…"
         self.assertEquals({"Tester": tweet_text}, test)
 
+    def pop_tweet_for_trainer(self):
+        self.plugin.assign_tweet_to_trainer("Tester", "I need help!")
+        tweet = self.plugin.pop_tweet_for_trainer("Tester")
+
+        self.assertEquals("I need help!", tweet)
+
     def test_update_corpus(self):
         self.plugin.update_corpus('SUPPORT_TRAINING_CORPUS',
                                   'I need help!',
@@ -199,8 +205,8 @@ class TestSocialSupportCommands(TestSocialSupport):
         self.assertEquals("4: Three - 3", self.bot.pop_message())
         self.assertEquals("5: Two - 2", self.bot.pop_message())
 
-    @vcr.use_cassette('tweets.json', inject_cassette=True)
-    def test_train_gimme(self, cassette):
+    @vcr.use_cassette('tweets.json')
+    def test_train_gimme(self):
         self.plugin.load_tweets_into_queue("SUPPORT_TRAINING_QUEUE")
         self.bot.push_message("!train gimme")
         self.assertIn("Does the person submitting this tweet",
